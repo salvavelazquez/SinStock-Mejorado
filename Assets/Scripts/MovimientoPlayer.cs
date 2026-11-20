@@ -73,7 +73,6 @@ public class MovimientoPlayer : MonoBehaviour
         // Salto
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            anim.SetTrigger("isJump");
             Salto();
         }
     }
@@ -96,10 +95,23 @@ public class MovimientoPlayer : MonoBehaviour
 
     public void Salto()
     {
-        enSuelo= Physics.CheckSphere(comprobadorSuelo.position, 0.1f, capaSuelo);
-        if(enSuelo)
+        enSuelo = Physics.CheckSphere(
+            comprobadorSuelo.position,
+            0.1f,
+            capaSuelo
+        );
+
+        if (enSuelo)
         {
-            rb.AddForce(Vector3.up*fuerzaSalto, ForceMode.Impulse);
+            rb.AddForce(
+                Vector3.up * fuerzaSalto,
+                ForceMode.Impulse
+            );
+
+            if (anim != null)
+            {
+                anim.SetTrigger("isJump");
+            }
         }
     }
 

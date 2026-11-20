@@ -1,0 +1,1 @@
+D:\Facultad de Ingenieria Unju\Tecnicatura en Videos Juegos\Diseo de Interfaz y Jugabilidad\SinStock-Mejorado\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\482g2a20\obj\arm64-v8a

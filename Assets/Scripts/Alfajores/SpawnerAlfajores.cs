@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class SpawnerAlfajores : MonoBehaviour
 {
+    [Header("Control del tutorial")]
+    [SerializeField] private bool puedeGenerar = true;
+
     public GameObject alfajorPrefab;
     public GameObject[] alfajoresPoderosos;
 
@@ -18,26 +21,33 @@ public class SpawnerAlfajores : MonoBehaviour
 
     private void Start()
     {
+        if (puedeGenerar)
+        {
+            IniciarGeneracionComun();
+        }
+    }
+
+    private void IniciarGeneracionComun()
+    {
+        CancelInvoke(nameof(GenerarAlfajor));
+
         InvokeRepeating(
             nameof(GenerarAlfajor),
             1f,
             tiempoSpawn
         );
-        /*InvokeRepeating(
-            nameof(GenerarAlfajorPoderoso),
-            5f,
-            10f
-        );*/
     }
 
-    void Update()
+    private void Update()
     {
+        if (!puedeGenerar)
+            return;
+
         temporizadorEspecial += Time.deltaTime;
 
         if (temporizadorEspecial >= intervaloEspecial)
         {
             temporizadorEspecial = 0f;
-
             VerificarEspeciales();
         }
     }
@@ -62,6 +72,9 @@ public class SpawnerAlfajores : MonoBehaviour
 
     void GenerarAlfajor()
     {
+        if (!puedeGenerar)
+            return;
+
         int indice = Random.Range(0, puntosSpawn.Length);
 
         Instantiate(
@@ -73,6 +86,9 @@ public class SpawnerAlfajores : MonoBehaviour
 
     public void GenerarAlfajorPoderoso()
     {
+        if (!puedeGenerar)
+            return;
+
         int indice = Random.Range(0, alfajoresPoderosos.Length);
         int posicionIndice = Random.Range(0, puntosSpawn.Length);
         Instantiate(
@@ -99,6 +115,9 @@ public class SpawnerAlfajores : MonoBehaviour
 
     void SpawnEspecial(GameObject prefab)
     {
+        if (!puedeGenerar)
+            return;
+
         int posicionIndice =
             Random.Range(0, puntosSpawn.Length);
 
@@ -108,4 +127,26 @@ public class SpawnerAlfajores : MonoBehaviour
             Quaternion.identity
         );
     }
+
+
+    public void PausarGeneracion()
+    {
+        puedeGenerar = false;
+
+        CancelInvoke(nameof(GenerarAlfajor));
+
+        temporizadorEspecial = 0f;
+    }
+
+    public void ReanudarGeneracion()
+    {
+        if (puedeGenerar)
+            return;
+
+        puedeGenerar = true;
+        temporizadorEspecial = 0f;
+
+        IniciarGeneracionComun();
+    }
+
 }
