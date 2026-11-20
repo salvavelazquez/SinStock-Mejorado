@@ -5,9 +5,20 @@ using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
+
+    [Header("Inicio de partida")]
+    [SerializeField] private IntroCamara introCamara;
+    [SerializeField] private float esperaDespuesCamara = 2f;
+
     [Header("Animacion del tutorial")]
     [SerializeField] private Animator animadorMano;
     [SerializeField] private GameObject imagenGesto;
+
+    [Header("Finalizacion de practica")]
+    [SerializeField] private GameObject panelFinPractica;
+    [SerializeField] private string nombreEscenaMenu;
+
+    private bool esPracticaVoluntaria = false;
 
     [Header("Interfaz")]
     [SerializeField] private GameObject panelTutorial;
@@ -38,18 +49,22 @@ public class TutorialManager : MonoBehaviour
     }
 
 
+
     private void Start()
     {
         bool completado =
             PlayerPrefs.GetInt(CLAVE_TUTORIAL, 0) == 1;
 
-        bool repetir = SolicitudTutorial.repetirTutorial;
+        // Guardamos si el jugador entro desde Practicar controles.
+        esPracticaVoluntaria = SolicitudTutorial.repetirTutorial;
 
-        // Consumimos la solicitud para que no se repita
-        // al reiniciar la escena.
+        // Limpiamos la solicitud para futuras partidas.
         SolicitudTutorial.repetirTutorial = false;
 
-        if (completado && !repetir)
+        if (panelFinPractica != null)
+            panelFinPractica.SetActive(false);
+
+        if (completado && !esPracticaVoluntaria)
         {
             panelTutorial.SetActive(false);
 
@@ -63,6 +78,7 @@ public class TutorialManager : MonoBehaviour
             RepetirTutorial();
         }
     }
+
 
 
 
@@ -159,34 +175,68 @@ public class TutorialManager : MonoBehaviour
     }
 
 
+
     private IEnumerator FinalizarTutorial()
     {
         tutorialActivo = false;
 
         textoInstruccion.text = "¡Listo! ¡A correr!";
 
-        // Ocultamos la mano al completar los gestos.
         if (imagenGesto != null)
             imagenGesto.SetActive(false);
 
         yield return new WaitForSeconds(esperaFinal);
 
+        // Guardamos que el tutorial ya fue completado.
         PlayerPrefs.SetInt(CLAVE_TUTORIAL, 1);
         PlayerPrefs.Save();
 
         panelTutorial.SetActive(false);
-        IniciarJuego();
+
+        if (esPracticaVoluntaria)
+        {
+            // No comienza la partida.
+            // Mostramos las opciones de finalizacion.
+            if (panelFinPractica != null)
+                panelFinPractica.SetActive(true);
+        }
+        else
+        {
+            // Primera vez: comienza la partida normalmente.
+            IniciarJuego();
+        }
     }
+
+
 
 
     private void IniciarJuego()
     {
+        StartCoroutine(EsperarCamaraEIniciar());
+    }
+
+    private IEnumerator EsperarCamaraEIniciar()
+    {
+        // Esperar a que termine la presentacion de Fulbito.
+        if (introCamara != null)
+        {
+            yield return new WaitUntil(
+                () => introCamara.IntroTerminada
+            );
+        }
+
+        // Dar tiempo para que el jugador se prepare.
+        yield return new WaitForSeconds(esperaDespuesCamara);
+
+        // Comenzar a generar obstaculos.
         if (spawnerObstaculos != null)
             spawnerObstaculos.ReanudarGeneracion();
 
+        // Comenzar a generar alfajores.
         if (spawnerAlfajores != null)
             spawnerAlfajores.ReanudarGeneracion();
     }
+
 
     [ContextMenu("Reiniciar progreso del tutorial")]
     public void ReiniciarProgresoTutorial()
@@ -196,4 +246,25 @@ public class TutorialManager : MonoBehaviour
 
         Debug.Log("Progreso del tutorial reiniciado");
     }
+
+
+    public void JugarAhora()
+    {
+        esPracticaVoluntaria = false;
+
+        if (panelFinPractica != null)
+            panelFinPractica.SetActive(false);
+
+        IniciarJuego();
+    }
+
+    public void VolverAlMenu()
+    {
+        SolicitudTutorial.repetirTutorial = false;
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            nombreEscenaMenu
+        );
+    }
+
 }
