@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class MovimientoPlayer : MonoBehaviour
 {
+    [Header("Control de movimiento")]
+    [SerializeField] private bool controlesHabilitados = true;
+
     [SerializeField] Transform posicionParent;
     [SerializeField] Transform[] arrayPosicionesHijos;
 
@@ -77,8 +80,16 @@ public class MovimientoPlayer : MonoBehaviour
         }
     }
 
+    public void HabilitarControles(bool habilitar)
+    {
+        controlesHabilitados = habilitar;
+    }
+
     public void MoverIzquierda()
     {
+        if (!controlesHabilitados)
+            return;
+
         if (indexPosicionActual > 0)
         {
             indexPosicionActual--;
@@ -87,6 +98,9 @@ public class MovimientoPlayer : MonoBehaviour
 
     public void MoverDerecha()
     {
+        if (!controlesHabilitados)
+            return;
+
         if (indexPosicionActual < arrayPosicionesHijos.Length - 1)
         {
             indexPosicionActual++;
@@ -95,6 +109,9 @@ public class MovimientoPlayer : MonoBehaviour
 
     public void Salto()
     {
+        if (!controlesHabilitados)
+            return;
+
         enSuelo = Physics.CheckSphere(
             comprobadorSuelo.position,
             0.1f,
