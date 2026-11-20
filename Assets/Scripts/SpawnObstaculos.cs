@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SpawnObstaculos : MonoBehaviour
 {
+    [Header("Control del tutorial")]
+    [SerializeField] private bool puedeGenerar = true;
     [SerializeField] private GameObject[] obstaculos; // Array de prefabs de obstáculos
     [SerializeField] private GameObject[] obstaculosGrandes; // Array de prefabs de obstáculos grandes
     [SerializeField] private float spawnInterval = 1.5f; // Intervalo de tiempo entre cada spawn
@@ -16,21 +18,43 @@ public class SpawnObstaculos : MonoBehaviour
     }
 
     // Update is called once per frame
+
     void Update()
     {
-        nextSpawnTime += Time.deltaTime; // Incrementa el tiempo transcurrido desde el último spawn
-        if (nextSpawnTime >= spawnInterval) // Verifica si ha pasado el tiempo de spawn
+        // Durante el tutorial no generamos obstáculos.
+        if (!puedeGenerar)
+            return;
+
+        nextSpawnTime += Time.deltaTime;
+
+        if (nextSpawnTime >= spawnInterval)
         {
-            Spawn(); // Llama al método para spawnear un obstáculo
-            nextSpawnTime = 0f; // Reinicia el tiempo para el próximo spawn
-            contadorObstaculos++; // Incrementa el contador de obstáculos lanzados
-                if (contadorObstaculos >= 5) // Si se han lanzado 5 obstáculos, permite lanzar un objeto grande
-                {
-                    lanzoObjetoGrande = false; // Permite lanzar un objeto grande
-                    contadorObstaculos = 0; // Reinicia el contador de obstáculos
-                }
+            Spawn();
+            nextSpawnTime = 0f;
+            contadorObstaculos++;
+
+            if (contadorObstaculos >= 5)
+            {
+                lanzoObjetoGrande = false;
+                contadorObstaculos = 0;
+            }
         }
     }
+
+
+    public void PausarGeneracion()
+    {
+        puedeGenerar = false;
+        nextSpawnTime = 0f;
+    }
+
+    public void ReanudarGeneracion()
+    {
+        nextSpawnTime = 0f;
+        puedeGenerar = true;
+    }
+
+
 
     public void Spawn()
     {
