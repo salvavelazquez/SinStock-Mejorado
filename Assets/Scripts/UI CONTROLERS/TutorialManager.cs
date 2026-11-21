@@ -258,13 +258,13 @@ public class TutorialManager : MonoBehaviour
         IniciarJuego();
     }
 
+
     public void VolverAlMenu()
     {
         SolicitudTutorial.repetirTutorial = false;
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            nombreEscenaMenu
-        );
+        CambioEntreEscenas.Instance.VolverAlMenuPrincipal();
     }
+
 
 }
